@@ -2,7 +2,6 @@ use std::env;
 use rubrix_cube_checker::io::{load_cube, parse_moves_file};
 use rubrix_cube_checker::movements::apply_move;
 use rubrix_cube_checker::compare::compare;
-use rubrix_cube_checker::cube::RubriksCube;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -25,8 +24,10 @@ fn main() {
     for m in moves {
         cube = apply_move(cube, m);
     }
+
+    // Output cube
     cube.print_cube();
-    
+
     // Compare
     if args.len() == 4 {
         let llm_cube_file = &args[3];

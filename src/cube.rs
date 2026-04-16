@@ -38,14 +38,22 @@ impl RubriksCube {
         None
     }
 
-    // Print Rubix cube for testing
-    pub fn print_cube(&self) {
-        let up = self.get_face(Face::Up).unwrap();
-        let down = self.get_face(Face::Down).unwrap();
-        let front = self.get_face(Face::Front).unwrap();
-        let back = self.get_face(Face::Back).unwrap();
-        let left = self.get_face(Face::Left).unwrap();
-        let right = self.get_face(Face::Right).unwrap();
+    // Format data to print
+    fn faces(&self) -> [&CubeFace; 6] {
+        [
+            self.get_face(Face::Up).unwrap(),
+            self.get_face(Face::Down).unwrap(),
+            self.get_face(Face::Front).unwrap(),
+            self.get_face(Face::Back).unwrap(),
+            self.get_face(Face::Left).unwrap(),
+            self.get_face(Face::Right).unwrap(),
+        ]
+    }
+
+    // Print visual flat cube
+    pub fn print_flat_cube(&self) {
+        // Get cube data
+        let [up, down, front, back, left, right] = self.faces();
 
         // Helper closure to access values
         let f = |face: &CubeFace, i: usize| face.face_data[i];
@@ -73,7 +81,16 @@ impl RubriksCube {
         // Bottom
         println!("     {} {}", f(down, 0), f(down, 1));
         println!("     {} {}", f(down, 2), f(down, 3));
+    }
+
+    // Print Rubix cube for testing
+    pub fn print_cube(&self) {
+        // Get cube data
+        let [up, down, front, back, left, right] = self.faces();
         
+        // Helper closure to access values
+        let f = |face: &CubeFace, i: usize| face.face_data[i];
+    
         // LLM Format
         println!("U:{} {};{} {}, L:{} {};{} {}, F:{} {};{} {}, R:{} {};{} {}, B:{} {};{} {}, D:{} {};{} {}", 
             f(up, 0), f(up, 1), f(up, 2), f(up, 3),
