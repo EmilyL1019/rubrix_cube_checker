@@ -51,8 +51,8 @@ impl RubriksCube {
         let f = |face: &CubeFace, i: usize| face.face_data[i];
 
         // Top
-        println!("      {} {}", f(up, 0), f(up, 1));
-        println!("      {} {}", f(up, 2), f(up, 3));
+        println!("     {} {}", f(up, 0), f(up, 1));
+        println!("     {} {}", f(up, 2), f(up, 3));
 
         // Middle (Left, Front, Right, Back)
         println!(
@@ -71,7 +71,17 @@ impl RubriksCube {
         );
 
         // Bottom
-        println!("      {} {}", f(down, 0), f(down, 1));
-        println!("      {} {}", f(down, 2), f(down, 3));
+        println!("     {} {}", f(down, 0), f(down, 1));
+        println!("     {} {}", f(down, 2), f(down, 3));
+        
+        // LLM Format
+        println!("U:{} {};{} {}, L:{} {};{} {}, F:{} {};{} {}, R:{} {};{} {}, B:{} {};{} {}, D:{} {};{} {}", 
+            f(up, 0), f(up, 1), f(up, 2), f(up, 3),
+            f(left, 0), f(left, 1), f(left, 2), f(left, 3),
+            f(front, 0), f(front, 1), f(front, 2), f(front, 3),
+            f(right, 0), f(right, 1), f(right, 2), f(right, 3),
+            f(back, 0), f(back, 1), f(back, 2), f(back, 3),
+            f(down, 0), f(down, 1), f(down, 2), f(down, 3))
     }
+    
 }
