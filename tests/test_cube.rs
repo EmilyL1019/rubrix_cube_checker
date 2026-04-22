@@ -1,7 +1,6 @@
 use rubrix_cube_checker::io::{load_cube, parse_moves_file};
 use rubrix_cube_checker::movements::apply_move;
 use rubrix_cube_checker::compare::compare;
-use std::path::Path;
 
 // Shared test runner
 // ----------------------------

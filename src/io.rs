@@ -1,10 +1,11 @@
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::fs;
-use crate::cube::{RubriksCube, Face, CubeFace};
+use crate::cube::{RubrixCube, Face, CubeFace};
 
 // List of possible moves
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Move {
     U, U1, U2,
     D, D1, D2,
@@ -14,78 +15,81 @@ pub enum Move {
     R, R1, R2
 }
 
-// Read file into Vec<Vec<i8>>
-fn read_lines(path: &str) -> Vec<Vec<i8>> {
+/// Parse face label into enum
+fn parse_face_label(label: &str) -> Face {
+    match label.trim() {
+        "U" => Face::Up,
+        "D" => Face::Down,
+        "F" => Face::Front,
+        "B" => Face::Back,
+        "L" => Face::Left,
+        "R" => Face::Right,
+        _ => panic!("Invalid face label: {}", label),
+    }
+}
+
+/// Read cube file into a HashMap<Face, Vec<u8>>
+fn read_faces(path: &str) -> HashMap<Face, Vec<u8>> {
     let file = File::open(path).expect("Cannot open file");
     let reader = BufReader::new(file);
 
-    reader
+    let line = reader
         .lines()
-        .map(|line| {
-            line.unwrap()
-                .split_whitespace()
-                .map(|s| s.parse::<i8>().expect("Invalid number"))
-                .collect::<Vec<i8>>()
-        })
-        .collect()
+        .next()
+        .expect("Empty file")
+        .expect("Bad line");
+
+    let mut map: HashMap<Face, Vec<u8>> = HashMap::new();
+
+    for part in line.split(',') {
+        let part = part.trim();
+
+        let mut split = part.splitn(2, ':');
+
+        let label = split
+            .next()
+            .expect("Missing label")
+            .trim();
+
+        let data = split
+            .next()
+            .expect("Missing face data")
+            .trim();
+
+        let face_vals: Vec<u8> = data
+            .replace(';', " ")
+            .split_whitespace()
+            .map(|s| s.parse::<u8>().expect("Invalid number"))
+            .collect();
+
+        if face_vals.len() != 4 {
+            panic!("Each face must have exactly 4 values");
+        }
+
+        let face = parse_face_label(label);
+        map.insert(face, face_vals);
+    }
+
+    map
 }
 
-// Build faces from cube
-fn build_faces(cube: Vec<Vec<i8>>) -> Vec<CubeFace> {
-    let mut faces = Vec::new();
-
-    // Up
-    let up = vec![
-        cube[0][0], cube[0][1],
-        cube[1][0], cube[1][1],
-    ];
-
-    // Left
-    let left= vec![
-        cube[2][0], cube[2][1],
-        cube[3][0], cube[3][1],
-    ];
-
-    // Front
-    let front = vec![
-        cube[2][2], cube[2][3],
-        cube[3][2], cube[3][3],
-    ];
-
-    // Right
-    let right = vec![
-        cube[2][4], cube[2][5],
-        cube[3][4], cube[3][5],
-    ];
-
-    // Back
-    let back = vec![
-        cube[2][6], cube[2][7],
-        cube[3][6], cube[3][7],
-    ];
-
-    // Down 
-    let down = vec![
-        cube[4][0], cube[4][1],
-        cube[5][0], cube[5][1],
-    ];
-
-    faces.push(CubeFace { face_data: up,    orientation: Face::Up });
-    faces.push(CubeFace { face_data: left,  orientation: Face::Left });
-    faces.push(CubeFace { face_data: front, orientation: Face::Front });
-    faces.push(CubeFace { face_data: right, orientation: Face::Right });
-    faces.push(CubeFace { face_data: back,  orientation: Face::Back });
-    faces.push(CubeFace { face_data: down,  orientation: Face::Down });
-
-    faces
+/// Build CubeFace vector in fixed internal order
+fn build_faces(map: HashMap<Face, Vec<u8>>) -> Vec<CubeFace> {
+    vec![
+        CubeFace { face_data: map[&Face::Up].clone(),    orientation: Face::Up },
+        CubeFace { face_data: map[&Face::Left].clone(),  orientation: Face::Left },
+        CubeFace { face_data: map[&Face::Front].clone(), orientation: Face::Front },
+        CubeFace { face_data: map[&Face::Right].clone(), orientation: Face::Right },
+        CubeFace { face_data: map[&Face::Back].clone(),  orientation: Face::Back },
+        CubeFace { face_data: map[&Face::Down].clone(),  orientation: Face::Down },
+    ]
 }
 
-// Load cube
-pub fn load_cube(path: &str) -> RubriksCube {
-    let cube = read_lines(path);
-    let faces = build_faces(cube);
-
-    return RubriksCube::new(faces);
+/// Load full cube
+pub fn load_cube(path: &str) -> RubrixCube {
+    let map = read_faces(path);
+    let faces = build_faces(map);
+    RubrixCube::new(faces)
 }
 
 // Read moves file 

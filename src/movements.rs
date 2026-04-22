@@ -1,8 +1,8 @@
-use crate::cube::{CubeFace, Face, RubriksCube};
+use crate::cube::{CubeFace, Face, RubrixCube};
 use crate::io::Move;
 
 // Get all face data
-fn get_all_face_data(faces: &Vec<CubeFace>) -> (Vec<i8>, Vec<i8>, Vec<i8>, Vec<i8>, Vec<i8>, Vec<i8>){
+fn get_all_face_data(faces: &Vec<CubeFace>) -> (Vec<u8>, Vec<u8>, Vec<u8>, Vec<u8>, Vec<u8>, Vec<u8>){
     let mut up_data = Vec::new();
     let mut front_data = Vec::new();
     let mut left_data = Vec::new();
@@ -24,7 +24,7 @@ fn get_all_face_data(faces: &Vec<CubeFace>) -> (Vec<i8>, Vec<i8>, Vec<i8>, Vec<i
 }
 
 // Rotate top face 90 degrees clockwise
-fn u(cube: RubriksCube) -> RubriksCube {
+fn u(cube: &RubrixCube) -> RubrixCube {
     // Extract face data 
     let (up_data, front_data, left_data, back_data, right_data, down_data) = get_all_face_data(&cube.faces);
 
@@ -62,12 +62,12 @@ fn u(cube: RubriksCube) -> RubriksCube {
     CubeFace {face_data: new_right_data, orientation: Face::Right},
     CubeFace {face_data: down_data, orientation: Face::Down},
 ];
-    return RubriksCube {faces: new_faces};
+    return RubrixCube {faces: new_faces};
 }
 
 
 // Rotate top face 90 degrees counter-clockwise
-fn u1(cube: RubriksCube) -> RubriksCube {
+fn u1(cube: &RubrixCube) -> RubrixCube {
    // Extract face data 
     let (up_data, front_data, left_data, back_data, right_data, down_data) = get_all_face_data(&cube.faces);
 
@@ -105,17 +105,16 @@ fn u1(cube: RubriksCube) -> RubriksCube {
     CubeFace {face_data: new_right_data, orientation: Face::Right},
     CubeFace {face_data: down_data, orientation: Face::Down},
 ];
-    return RubriksCube {faces: new_faces};
+    return RubrixCube {faces: new_faces};
 }
 
 // Rotate top face 180 degrees 
-fn u2(cube: RubriksCube) -> RubriksCube {
-    let new_cube_1 = u(cube);
-    return u(new_cube_1);
+fn u2(cube: &RubrixCube) -> RubrixCube {
+    return u(&(&u(cube)));
 }
 
 // Rotate bottom face 90 degrees clockwise
-fn d(cube: RubriksCube) -> RubriksCube {
+fn d(cube: &RubrixCube) -> RubrixCube {
     // Extract face data 
     let (up_data, front_data, left_data, back_data, right_data, down_data) = get_all_face_data(&cube.faces);
 
@@ -153,11 +152,11 @@ fn d(cube: RubriksCube) -> RubriksCube {
     CubeFace {face_data: new_right_data, orientation: Face::Right},
     CubeFace {face_data: new_down_data, orientation: Face::Down},
 ];
-    return RubriksCube {faces: new_faces};
+    return RubrixCube {faces: new_faces};
 }
 
 // Rotate bottom face 90 degrees counter-clockwise
-fn d1(cube: RubriksCube) -> RubriksCube {
+fn d1(cube: &RubrixCube) -> RubrixCube {
    // Extract face data 
     let (up_data, front_data, left_data, back_data, right_data, down_data) = get_all_face_data(&cube.faces);
 
@@ -195,17 +194,17 @@ fn d1(cube: RubriksCube) -> RubriksCube {
         CubeFace {face_data: new_right_data, orientation: Face::Right},
         CubeFace {face_data: new_down_data, orientation: Face::Down},
     ];
-    return RubriksCube {faces: new_faces};
+    return RubrixCube {faces: new_faces};
 }
 
 // Rotate DOWN face 180 degrees 
-fn d2(cube: RubriksCube) -> RubriksCube {
+fn d2(cube: &RubrixCube) -> RubrixCube {
     // This is two d moves
-    return d(d(cube));
+    return d(&d(&cube));
 }
 
 // Rotate front face 90 degrees clockwise
-fn f(cube: RubriksCube) -> RubriksCube {
+fn f(cube: &RubrixCube) -> RubrixCube {
     // Extract face data 
     let (up_data, front_data, left_data, back_data, right_data, down_data) = get_all_face_data(&cube.faces);
 
@@ -244,11 +243,11 @@ fn f(cube: RubriksCube) -> RubriksCube {
         CubeFace {face_data: new_down_data, orientation: Face::Down},
     ];
 
-    return RubriksCube {faces: new_faces};
+    return RubrixCube {faces: new_faces};
 }
 
 // Rotate front face 90 degrees counter-clockwise
-fn f1(cube: RubriksCube) -> RubriksCube {
+fn f1(cube: &RubrixCube) -> RubrixCube {
     // Extract face data 
     let (up_data, front_data, left_data, back_data, right_data, down_data) = get_all_face_data(&cube.faces);
 
@@ -286,17 +285,17 @@ fn f1(cube: RubriksCube) -> RubriksCube {
         CubeFace {face_data: new_right_data, orientation: Face::Right},
         CubeFace {face_data: new_down_data, orientation: Face::Down},
     ];
-    return RubriksCube {faces: new_faces};
+    return RubrixCube {faces: new_faces};
 }
 
 // Rotate front face 180 degrees
-fn f2(cube: RubriksCube) -> RubriksCube {
+fn f2(cube: &RubrixCube) -> RubrixCube {
     // This is 2 f moves
-    return f(f(cube));
+    return f(&f(cube));
 }
 
 // Rotate BACK face 90 degrees clockwise
-fn b(cube: RubriksCube) -> RubriksCube {
+fn b(cube: &RubrixCube) -> RubrixCube {
     // Extract face data 
     let (up_data, front_data, left_data, back_data, right_data, down_data) = get_all_face_data(&cube.faces);
 
@@ -334,11 +333,11 @@ fn b(cube: RubriksCube) -> RubriksCube {
         CubeFace {face_data: new_right_data, orientation: Face::Right},
         CubeFace {face_data: new_down_data, orientation: Face::Down},
     ];
-    return RubriksCube {faces: new_faces};
+    return RubrixCube {faces: new_faces};
 }
 
 // Rotate BACK face 90 degrees counter clockwise
-fn b1(cube: RubriksCube) -> RubriksCube {
+fn b1(cube: &RubrixCube) -> RubrixCube {
     // Extract face data 
     let (up_data, front_data, left_data, back_data, right_data, down_data) = get_all_face_data(&cube.faces);
 
@@ -376,17 +375,17 @@ fn b1(cube: RubriksCube) -> RubriksCube {
         CubeFace {face_data: new_right_data, orientation: Face::Right},
         CubeFace {face_data: new_down_data, orientation: Face::Down},
     ];
-    return RubriksCube {faces: new_faces};
+    return RubrixCube {faces: new_faces};
 }
 
 // Rotate BACK face 180 degrees
-fn b2(cube: RubriksCube) -> RubriksCube {
+fn b2(cube: &RubrixCube) -> RubrixCube {
     // This is 2 b moves
-    return b(b(cube));
+    return b(&b(cube));
 }
 
 // Rotate left face 90 degrees clockwise
-fn l(cube: RubriksCube) -> RubriksCube {
+fn l(cube: &RubrixCube) -> RubrixCube {
     // Extract face data 
     let (up_data, front_data, left_data, back_data, right_data, down_data) = get_all_face_data(&cube.faces);
     
@@ -424,11 +423,11 @@ fn l(cube: RubriksCube) -> RubriksCube {
         CubeFace {face_data: right_data, orientation: Face::Right},
         CubeFace {face_data: new_down_data, orientation: Face::Down},
     ];
-    return RubriksCube {faces: new_faces};
+    return RubrixCube {faces: new_faces};
 }
 
 // Rotate left face 90 degrees counter clockwise
-fn l1(cube: RubriksCube) -> RubriksCube {
+fn l1(cube: &RubrixCube) -> RubrixCube {
     // Extract face data 
     let (up_data, front_data, left_data, back_data, right_data, down_data) = get_all_face_data(&cube.faces);
 
@@ -466,17 +465,17 @@ fn l1(cube: RubriksCube) -> RubriksCube {
         CubeFace {face_data: right_data, orientation: Face::Right},
         CubeFace {face_data: new_down_data, orientation: Face::Down},
     ];
-    return RubriksCube {faces: new_faces};
+    return RubrixCube {faces: new_faces};
 }
 
 // Rotate left face 180 degrees 
-fn l2(cube: RubriksCube) -> RubriksCube {
+fn l2(cube: &RubrixCube) -> RubrixCube {
     // This is 2 l moves
-    return l(l(cube));
+    return l(&l(cube));
 }
 
 // Rotate right face 90 degrees clockwise
-fn r(cube: RubriksCube) -> RubriksCube {
+fn r(cube: &RubrixCube) -> RubrixCube {
     // Extract face data 
     let (up_data, front_data, left_data, back_data, right_data, down_data) = get_all_face_data(&cube.faces);
 
@@ -515,12 +514,12 @@ fn r(cube: RubriksCube) -> RubriksCube {
         CubeFace {face_data: new_down_data, orientation: Face::Down},
     ];
     get_all_face_data(&new_faces);
-    return RubriksCube {faces: new_faces};
+    return RubrixCube {faces: new_faces};
 }
 
 
 // Rotate right face 90 degrees clockwise
-fn r1(cube: RubriksCube) -> RubriksCube {
+fn r1(cube: &RubrixCube) -> RubrixCube {
     // Extract face data 
     let (up_data, front_data, left_data, back_data, right_data, down_data) = get_all_face_data(&cube.faces);
 
@@ -559,17 +558,17 @@ fn r1(cube: RubriksCube) -> RubriksCube {
         CubeFace {face_data: new_down_data, orientation: Face::Down},
     ];
     get_all_face_data(&new_faces);
-    return RubriksCube {faces: new_faces};
+    return RubrixCube {faces: new_faces};
 }
 
 // Rotate right face 180 degrees 
-fn r2(cube: RubriksCube) -> RubriksCube {
+fn r2(cube: &RubrixCube) -> RubrixCube {
     // This is 2 r moves
-    return r(r(cube));
+    return r(&r(cube));
 }
 
-// Perform one move on the Rubriks cube
-pub fn apply_move(cube: RubriksCube, cube_move: Move) -> RubriksCube {
+// Perform one move on the Rubrix cube
+pub fn apply_move(cube: &RubrixCube, cube_move: Move) -> RubrixCube {
     return match cube_move {
         Move::U  => u(cube),
         Move::U1 => u1(cube),

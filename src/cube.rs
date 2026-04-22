@@ -1,5 +1,6 @@
-// A representation of Rubriks cube
-#[derive(PartialEq, Clone)]
+
+// A representation of Rubrix cube
+#[derive(PartialEq, Eq, Hash, Clone, Copy)]
 pub enum Face {
     Front,
     Back,
@@ -10,22 +11,59 @@ pub enum Face {
 }
 
 // This represents one face of a cube. It has the colors of the 4 cells in row-major order.
-#[derive(PartialEq)]
+#[derive(PartialEq, Eq, Hash, Clone)]
 pub struct CubeFace {
-    pub face_data: Vec<i8>,
+    pub face_data: Vec<u8>,
     pub orientation: Face
 }
 
-// This represents the entire Rubriks cube.
-pub struct RubriksCube {
+// This represents the entire Rubrix cube.
+#[derive(Eq, Hash, PartialEq, Clone)]
+pub struct RubrixCube {
     pub faces: Vec<CubeFace>
 }
 
-impl RubriksCube {
+impl RubrixCube {
     // Builds a new cube out of the cube's data
-    pub fn new(faces: Vec<CubeFace>) -> RubriksCube {   
-        let cube: RubriksCube = RubriksCube {faces};
+    pub fn new(faces: Vec<CubeFace>) -> RubrixCube {   
+        let cube: RubrixCube = RubrixCube {faces};
         return cube;
+    }
+
+      // Create a solved Rubik's cube
+    pub fn new_solved() -> RubrixCube {
+        let faces = vec![
+            CubeFace { face_data: vec![0, 0, 0, 0], orientation: Face::Up },
+            CubeFace { face_data: vec![1, 1, 1, 1], orientation: Face::Down },
+            CubeFace { face_data: vec![2, 2, 2, 2], orientation: Face::Front },
+            CubeFace { face_data: vec![3, 3, 3, 3], orientation: Face::Back },
+            CubeFace { face_data: vec![4, 4, 4, 4], orientation: Face::Left },
+            CubeFace { face_data: vec![5, 5, 5, 5], orientation: Face::Right },
+        ];
+
+        RubrixCube::new(faces)
+    }
+
+    // Determine if cube is solved
+    pub fn is_solved(&self) -> bool {
+        let mut nums: Vec<u8> = Vec::new();
+
+        for face in &self.faces {
+            let first = face.face_data[0];
+            
+            // Check all values on this face are the same
+            if face.face_data.iter().any(|&x| x != first) {
+                return false;
+            }
+            // Check color/value not already used by another face
+            if nums.contains(&first) {
+                return false;
+            }
+            
+            nums.push(first);
+        }
+
+        true
     }
 
     // Get data from 1 given face
@@ -39,7 +77,7 @@ impl RubriksCube {
     }
 
     // Format data to print
-    fn faces(&self) -> [&CubeFace; 6] {
+    pub fn faces(&self) -> [&CubeFace; 6] {
         [
             self.get_face(Face::Up).unwrap(),
             self.get_face(Face::Down).unwrap(),
@@ -49,6 +87,7 @@ impl RubriksCube {
             self.get_face(Face::Right).unwrap(),
         ]
     }
+
 
     // Print visual flat cube
     pub fn print_flat_cube(&self) {
