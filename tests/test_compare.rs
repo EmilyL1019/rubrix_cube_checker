@@ -63,6 +63,7 @@ mod tests {
         scrambled.print_cube();
 
         let result = moves_to_solved(&scrambled);
+        println!("{:?}", result.clone().unwrap());
 
         assert!(result.is_some());
         let expected = vec![Move::U, Move::F, Move::L];

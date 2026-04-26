@@ -93,9 +93,9 @@ pub fn load_cube(path: &str) -> RubrixCube {
 }
 
 // Read moves file 
-pub fn parse_moves_file(file:&String) -> Vec<Move> {
+pub fn parse_moves_file(file:&str) -> Vec<Move> {
     let content = fs::read_to_string(file)
-        .expect("Failed to read moves file");
+    .unwrap_or_else(|e| panic!("Failed to read moves file {}: {}", file, e));
 
     content
         .split_whitespace() // splits on spaces, tabs, AND newlines

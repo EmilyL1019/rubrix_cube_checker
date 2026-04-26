@@ -117,11 +117,54 @@ fn impossible(cube: &RubrixCube) -> bool {
 
 }
 
+fn is_inverse(a: &Move, b: &Move) -> bool {
+    matches!(
+        (a, b),
+        (Move::U, Move::U2) | (Move::U2, Move::U) |
+        (Move::D, Move::D2) | (Move::D2, Move::D) |
+        (Move::F, Move::F2) | (Move::F2, Move::F) |
+        (Move::B, Move::B2) | (Move::B2, Move::B) |
+        (Move::L, Move::L2) | (Move::L2, Move::L) |
+        (Move::R, Move::R2) | (Move::R2, Move::R)
+    )
+}
+
 pub fn moves_to_solved(start: &RubrixCube) -> Option<Vec<Move>> {
     let moves: Vec<Move> = vec![];
     // Call recurrsive helper
     println!("Recursive");
+    //println!("Start: {:?}", start.print_flat_cube());
     return moves_solved(start, moves);
+}
+
+fn same_face(a: &Move, b: &Move) -> bool {
+    matches!(
+        (a, b),
+
+        (Move::U,  Move::U)  | (Move::U,  Move::U1) | (Move::U,  Move::U2) |
+        (Move::U1, Move::U)  | (Move::U1, Move::U1)| (Move::U1, Move::U2) |
+        (Move::U2, Move::U)  | (Move::U2, Move::U1)| (Move::U2, Move::U2) |
+
+        (Move::D,  Move::D)  | (Move::D,  Move::D1) | (Move::D,  Move::D2) |
+        (Move::D1, Move::D)  | (Move::D1, Move::D1)| (Move::D1, Move::D2) |
+        (Move::D2, Move::D)  | (Move::D2, Move::D1)| (Move::D2, Move::D2) |
+
+        (Move::L,  Move::L)  | (Move::L,  Move::L1) | (Move::L,  Move::L2) |
+        (Move::L1, Move::L)  | (Move::L1, Move::L1)| (Move::L1, Move::L2) |
+        (Move::L2, Move::L)  | (Move::L2, Move::L1)| (Move::L2, Move::L2) |
+
+        (Move::R,  Move::R)  | (Move::R,  Move::R1) | (Move::R, Move::R2) |
+        (Move::R1, Move::R)  | (Move::R1, Move::R1)| (Move::R1, Move::R2) |
+        (Move::R2, Move::R)  | (Move::R2, Move::R1)| (Move::R2, Move::R2) |
+
+        (Move::F,  Move::F)  | (Move::F,  Move::F1) | (Move::F, Move::F2) |
+        (Move::F1, Move::F)  | (Move::F1, Move::F1)| (Move::F1, Move::F2) |
+        (Move::F2, Move::F)  | (Move::F2, Move::F1)| (Move::F2, Move::F2) |
+
+        (Move::B,  Move::B)  | (Move::B,  Move::B1) | (Move::B, Move::B2) |
+        (Move::B1, Move::B)  | (Move::B1, Move::B1)| (Move::B1, Move::B2) |
+        (Move::B2, Move::B)  | (Move::B2, Move::B1)| (Move::B2, Move::B2)
+    )
 }
 
 fn moves_solved(start: &RubrixCube, moves: Vec<Move>) -> Option<Vec<Move>> {
@@ -129,28 +172,54 @@ fn moves_solved(start: &RubrixCube, moves: Vec<Move>) -> Option<Vec<Move>> {
     if start.is_solved() {
         return Some(moves);
     }
-    // If cube is impossible
-    else if impossible(start) {
-        return None;
-    }
 
     let mut queue: VecDeque<(RubrixCube, Vec<Move>)> = VecDeque::new();
     queue.push_back((start.clone(), vec![]));
+    let mut visited = HashSet::new();
+    visited.insert(start.clone());
+    let mut seen: usize = 0;
 
     while let Some((cube, moves)) = queue.pop_front() {
+        // All variations can be solved in 11 moves or less
+        if moves.len() >= 11 {
+            continue; 
+        }
+        seen += 1;
+
+        if seen % 10 == 0 {
+            println!(
+                "Expanded: {}, Queue size: {}, Depth: {}",
+                seen,
+                queue.len(),
+                moves.len()
+            );
+        }
+
         for mv in MOVES {
+            if let Some(last) = moves.last() {
+                if same_face(last, &mv) || is_inverse(last, &mv) {
+                    continue;
+                }
+            }
             let mut new_moves = moves.clone();
             new_moves.push(mv.clone());
 
-            let next_cube = apply_move(&cube, mv);
+            let next_cube = apply_move(&cube, mv.clone());
+            //println!("{:?} {:?}", next_cube.print_flat_cube(), mv);
 
             if next_cube.is_solved() {
                 return Some(new_moves);
             }
 
-            if !impossible(&next_cube) {
-                queue.push_back((next_cube, new_moves));
+            if impossible(&next_cube) {
+                continue;
             }
+            if visited.contains(&next_cube) {
+                continue;
+            }
+
+            visited.insert(next_cube.clone());
+            queue.push_back((next_cube, new_moves));
         }
     }
 
