@@ -48,7 +48,7 @@ while [[ $count -lt $NUM_CUBES ]]; do
     start_cube=$(tr '\n' ' ' < "$OUTFILE" | sed 's/[[:space:]]*$//')
 
     ref=$(cd "$PROJECT" && cargo run --quiet -- "$OUTFILE")
-    echo -e "$start_cube\t$ref" >> "$OUT"
+    echo -e "$start_cube,$ref" >> "$OUT"
     count=$((count + 1))
 done
 echo "Created dataset: $OUT"

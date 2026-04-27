@@ -48,7 +48,7 @@ fn main() {
 
             match solve {
                 Some(mv) => println!(
-                    "{}\t{}",
+                    "{},{}",
                     mv.len(), moves_to_string(mv)
                 ),
                 None => println!("Unsolvable!"),
@@ -65,19 +65,32 @@ fn main() {
 
             let moves = rubrix_cube_checker::io::parse_moves_file(moves_file, true);
 
-            for m in moves {
-                new_cube = apply_move(&new_cube, m);
+            for m in &moves {
+                new_cube = apply_move(&new_cube, m.clone());
             }
 
             println!("Solved cube?: {:?}", new_cube.is_solved());
-
-            match moves_to_solved(&new_cube) {
-                Some(solution) => {
-                    println!("Solution: {:?}", solution);
-                }
+            let best_moves = match moves_to_solved(&cube) {
+                Some(m) => m,
                 None => {
-                    println!("No solution found (cube may be impossible or too deep).");
+                    eprintln!("No solution found");
+                    vec![]
                 }
+            };
+            let moves_to_sol = match moves_to_solved(&new_cube) {
+                Some(m) => m,
+                None => {
+                    eprintln!("No solution found");
+                    vec![]
+                }
+            };
+            if new_cube.is_solved() {
+                if best_moves.len() < moves.len() {
+                    println!("Minimum required steps: {}. LLM Steps: {}", best_moves.len(), moves.len())
+                }
+            }
+            else {
+                println!("Correct moves: {:?}, Moves Needed with LLM Steps: {:?}", best_moves, moves_to_sol);
             }
         }
 

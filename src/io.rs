@@ -41,7 +41,7 @@ fn read_faces(path: &str) -> HashMap<Face, Vec<u8>> {
 
     let mut map: HashMap<Face, Vec<u8>> = HashMap::new();
 
-    for part in line.split(',') {
+    for part in line.split('|') {
         let part = part.trim();
 
         let mut split = part.splitn(2, ':');

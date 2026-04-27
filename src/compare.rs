@@ -117,18 +117,6 @@ fn impossible(cube: &RubrixCube) -> bool {
 
 }
 
-fn is_inverse(a: &Move, b: &Move) -> bool {
-    matches!(
-        (a, b),
-        (Move::U, Move::U2) | (Move::U2, Move::U) |
-        (Move::D, Move::D2) | (Move::D2, Move::D) |
-        (Move::F, Move::F2) | (Move::F2, Move::F) |
-        (Move::B, Move::B2) | (Move::B2, Move::B) |
-        (Move::L, Move::L2) | (Move::L2, Move::L) |
-        (Move::R, Move::R2) | (Move::R2, Move::R)
-    )
-}
-
 pub fn moves_to_solved(start: &RubrixCube) -> Option<Vec<Move>> {
     let moves: Vec<Move> = vec![];
     // Call recurrsive helper
@@ -175,16 +163,16 @@ fn moves_solved(start: &RubrixCube, moves: Vec<Move>) -> Option<Vec<Move>> {
     queue.push_back((start.clone(), vec![]));
     let mut visited = HashSet::new();
     visited.insert(start.clone());
-    let mut seen: usize = 0;
+    //let mut seen: usize = 0;
 
     while let Some((cube, moves)) = queue.pop_front() {
         // All variations can be solved in 11 moves or less
         if moves.len() >= 11 {
             continue; 
         }
-        seen += 1;
+        /*seen += 1;
 
-        /*if seen % 1000 == 0 {
+        if seen % 1000 == 0 {
             println!(
                 "Expanded: {}, Queue size: {}, Depth: {}",
                 seen,
@@ -194,8 +182,9 @@ fn moves_solved(start: &RubrixCube, moves: Vec<Move>) -> Option<Vec<Move>> {
         }*/
 
         for mv in MOVES {
+            println!("Before: {:?} {:?}", moves, mv);
             if let Some(last) = moves.last() {
-                if same_face(last, &mv) || is_inverse(last, &mv) {
+                if same_face(last, &mv) {
                     continue;
                 }
             }
@@ -203,7 +192,7 @@ fn moves_solved(start: &RubrixCube, moves: Vec<Move>) -> Option<Vec<Move>> {
             new_moves.push(mv.clone());
 
             let next_cube = apply_move(&cube, mv.clone());
-            //println!("{:?} {:?}", next_cube.print_flat_cube(), mv);
+            println!("{:?}", new_moves);
 
             if next_cube.is_solved() {
                 return Some(new_moves);

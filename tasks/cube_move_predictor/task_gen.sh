@@ -2,7 +2,7 @@
 
 BASE="/Users/emilylight/Desktop/CSC592-EvalAI/rubrix_cube_checker/tests"
 PROJECT="/Users/emilylight/Desktop/CSC592-EvalAI/rubrix_cube_checker"
-OUT="$PROJECT/cube_move_predictor/values.csv"
+OUT="$PROJECT/tasks/cube_move_predictor/values.csv"
 TMP_MOVES="$PROJECT/tmp_moves.txt"
 
 CUBES=(
@@ -14,7 +14,7 @@ CUBES=(
 MOVES=(U U1 U2 D D1 D2 L L1 L2 R R1 R2 F F1 F2 B B1 B2)
 
 # reset file
-echo -e "starting_cube\tfinal_cube\tmoves" > "$OUT"
+echo -e "starting_cube,final_cube,moves" > "$OUT"
 
 count=0
 
@@ -55,7 +55,7 @@ while [[ $count -lt 30 ]]; do
     start_cube=$(tr '\n' ' ' < "$CUBE_FILE" | sed 's/[[:space:]]*$//')
 
     # write CSV row (NO QUOTES)
-    echo -e "$start_cube\t$result\t$movestr" >> "$OUT"
+    echo -e "$start_cube,$result,$movestr" >> "$OUT"
 
     ((count++))
 

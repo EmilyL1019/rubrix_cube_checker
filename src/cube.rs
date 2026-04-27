@@ -131,7 +131,7 @@ impl RubrixCube {
         let f = |face: &CubeFace, i: usize| face.face_data[i];
     
         // LLM Format
-        println!("U:{} {};{} {}, L:{} {};{} {}, F:{} {};{} {}, R:{} {};{} {}, B:{} {};{} {}, D:{} {};{} {}", 
+        println!("U:{} {};{} {}| L:{} {};{} {}| F:{} {};{} {}| R:{} {};{} {}| B:{} {};{} {}| D:{} {};{} {}", 
             f(up, 0), f(up, 1), f(up, 2), f(up, 3),
             f(left, 0), f(left, 1), f(left, 2), f(left, 3),
             f(front, 0), f(front, 1), f(front, 2), f(front, 3),

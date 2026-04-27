@@ -2,7 +2,7 @@
 
 BASE="/Users/emilylight/Desktop/CSC592-EvalAI/rubrix_cube_checker/tests"
 PROJECT="/Users/emilylight/Desktop/CSC592-EvalAI/rubrix_cube_checker"
-OUT="$PROJECT/transformation_tasks/values.tsv"
+OUT="$PROJECT/tasks/transformation_tasks/values.csv"
 TMP_MOVES="$PROJECT/temp_moves.txt"
 
 # cube files
@@ -16,7 +16,7 @@ CUBES=(
 MOVES=(U U1 U2 D D1 D2 L L1 L2 R R1 R2 F F1 F2 B B1 B2)
 
 # reset output file (TSV)
-echo -e "starting_cube\tmoves\tresult_cube" > "$OUT"
+echo -e "starting_cube,moves,result_cube" > "$OUT"
 
 # ----------------------------
 # helpers
@@ -95,7 +95,7 @@ for CUBE_FILE in "${CUBES[@]}"; do
         result=$(cd "$PROJECT" && cargo run --quiet -- --apply "$CUBE_FILE" "$TMP_MOVES")
         result=$(echo "$result" | tr '\n' ' ' | sed 's/[[:space:]]*$//')
 
-        echo -e "$cube_contents\t$movestr\t$result" >> "$OUT"
+        echo -e "$cube_contents,$movestr,$result" >> "$OUT"
     done
 
     # ------------------------
@@ -109,7 +109,7 @@ for CUBE_FILE in "${CUBES[@]}"; do
             result=$(cd "$PROJECT" && cargo run --quiet -- --apply "$CUBE_FILE" "$TMP_MOVES")
             result=$(echo "$result" | tr '\n' ' ' | sed 's/[[:space:]]*$//')
 
-            echo -e "$cube_contents\t$movestr\t$result" >> "$OUT"
+            echo -e "$cube_contents,$movestr,$result" >> "$OUT"
         fi
 
     done < <(
@@ -131,7 +131,7 @@ for CUBE_FILE in "${CUBES[@]}"; do
             result=$(cd "$PROJECT" && cargo run --quiet -- --apply "$CUBE_FILE" "$TMP_MOVES")
             result=$(echo "$result" | tr '\n' ' ' | sed 's/[[:space:]]*$//')
 
-            echo -e "$cube_contents\t$movestr\t$result" >> "$OUT"
+            echo -e "$cube_contents,$movestr,$result" >> "$OUT"
         fi
 
     done < <(
