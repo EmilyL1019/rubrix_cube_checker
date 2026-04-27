@@ -132,8 +132,6 @@ fn is_inverse(a: &Move, b: &Move) -> bool {
 pub fn moves_to_solved(start: &RubrixCube) -> Option<Vec<Move>> {
     let moves: Vec<Move> = vec![];
     // Call recurrsive helper
-    println!("Recursive");
-    //println!("Start: {:?}", start.print_flat_cube());
     return moves_solved(start, moves);
 }
 
@@ -186,14 +184,14 @@ fn moves_solved(start: &RubrixCube, moves: Vec<Move>) -> Option<Vec<Move>> {
         }
         seen += 1;
 
-        if seen % 10 == 0 {
+        /*if seen % 1000 == 0 {
             println!(
                 "Expanded: {}, Queue size: {}, Depth: {}",
                 seen,
                 queue.len(),
                 moves.len()
             );
-        }
+        }*/
 
         for mv in MOVES {
             if let Some(last) = moves.last() {

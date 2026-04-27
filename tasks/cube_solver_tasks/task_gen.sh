@@ -2,135 +2,53 @@
 
 BASE="/Users/emilylight/Desktop/CSC592-EvalAI/rubrix_cube_checker/tests"
 PROJECT="/Users/emilylight/Desktop/CSC592-EvalAI/rubrix_cube_checker"
-OUT="$PROJECT/cube_solver_tasks/values.tsv"
-
-CUBES=(
-"rubrix1.txt"
-"rubrix2.txt"
-"rubrix3.txt"
-)
+OUT="$PROJECT/tasks/cube_solver_tasks/values.tsv"
+OUTFILE="$PROJECT/tasks/cube_solver_tasks/out.txt"
 
 MOVES=(U U1 U2 D D1 D2 L L1 L2 R R1 R2 F F1 F2 B B1 B2)
 
-# -----------------------------------
-# output header
-# -----------------------------------
-echo -e "starting_cube\tmoves\tresult_cube" > "$OUT"
+NUM_CUBES=30
+CUBE="$BASE/solved.txt"
 
-# -----------------------------------
-# generate valid move sequence
-# rules:
-# - no same face twice in a row
-# - no opposite face consecutively
-# -----------------------------------
-gen_moves() {
-    local len=$1
-    local seq=""
-    local prev=""
-    local m
-    local f
+# reset dataset
+echo -e "starting_cube\tnum_moves\texample_ref" > "$OUT"
 
-    for ((i=0; i<len; i++)); do
+count=0
+
+while [[ $count -lt $NUM_CUBES ]]; do
+
+    # random length 1-3
+    LEN=$((1 + RANDOM % 3))
+
+    movestr=""
+    prev_face=""
+
+    # build move sequence
+    for ((i=0; i<LEN; i++)); do
         while true; do
             m=${MOVES[$RANDOM % ${#MOVES[@]}]}
-            f="${m:0:1}"
+            face="${m:0:1}"
 
-            # same face twice in row
-            [[ "$f" == "$prev" ]] && continue
-
-            # opposite faces consecutively
-            case "$prev$f" in
-                UD|DU|LR|RL|FB|BF) continue ;;
-            esac
-
-            seq="$seq $m"
-            prev="$f"
-            break
+            # no same face twice in a row
+            if [[ "$face" != "$prev_face" ]]; then
+                movestr="$movestr $m"
+                prev_face="$face"
+                break
+            fi
         done
     done
 
-    echo "$seq" | sed 's/^ *//'
-}
+    # trim leading space
+    movestr="$(echo "$movestr" | sed 's/^ *//')"
 
-# -----------------------------------
-# apply moves using Rust program
-# -----------------------------------
-apply() {
-    local cube=$1
-    local moves=$2
-    local file="$BASE/move.txt"
+    echo "cargo run -- --apply $CUBE $movestr > $OUTFILE"
+    # apply moves to solved cube
+    cargo run -- --apply "$CUBE" "$movestr" > "$OUTFILE"
+    # capture scrambled cube (this is the starting cube)
+    start_cube=$(tr '\n' ' ' < "$OUTFILE" | sed 's/[[:space:]]*$//')
 
-    echo "$moves" > "$file"
-
-    cd "$PROJECT" && cargo run --quiet -- --apply "$cube" "$file"
-}
-
-# -----------------------------------
-# flatten multiline output to one line
-# -----------------------------------
-flatten() {
-    tr '\n' ' ' | sed 's/[[:space:]]*$//'
-}
-
-# -----------------------------------
-# main generation loop
-# 9 one-move
-# 11 two-move
-# 11 three-move
-# for each cube
-# -----------------------------------
-for CUBE in "${CUBES[@]}"; do
-
-    CUBE_FILE="$BASE/$CUBE"
-    echo "Processing $CUBE_FILE"
-
-    start_cube=$(tr '\n' ' ' < "$CUBE_FILE" | sed 's/[[:space:]]*$//')
-
-    count1=0
-    count2=0
-    count3=0
-
-    # -------------------------
-    # 1 move
-    # -------------------------
-    while [[ $count1 -lt 9 ]]; do
-        m=${MOVES[$RANDOM % ${#MOVES[@]}]}
-
-        result=$(apply "$CUBE_FILE" "$m" | flatten)
-
-        echo -e "$start_cube\t$m\t$result" >> "$OUT"
-
-        ((count1++))
-    done
-
-    # -------------------------
-    # 2 moves
-    # -------------------------
-    while [[ $count2 -lt 11 ]]; do
-        moves=$(gen_moves 2)
-
-        result=$(apply "$CUBE_FILE" "$moves" | flatten)
-
-        echo -e "$start_cube\t$moves\t$result" >> "$OUT"
-
-        ((count2++))
-    done
-
-    # -------------------------
-    # 3 moves
-    # -------------------------
-    while [[ $count3 -lt 11 ]]; do
-        moves=$(gen_moves 3)
-
-        result=$(apply "$CUBE_FILE" "$moves" | flatten)
-
-        echo -e "$start_cube\t$moves\t$result" >> "$OUT"
-
-        ((count3++))
-    done
-
+    ref=$(cd "$PROJECT" && cargo run --quiet -- "$OUTFILE")
+    echo -e "$start_cube\t$ref" >> "$OUT"
+    count=$((count + 1))
 done
-
-rm -f "$BASE/move.txt"
-
 echo "Created dataset: $OUT"

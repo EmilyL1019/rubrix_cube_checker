@@ -137,7 +137,7 @@ impl RubrixCube {
             f(front, 0), f(front, 1), f(front, 2), f(front, 3),
             f(right, 0), f(right, 1), f(right, 2), f(right, 3),
             f(back, 0), f(back, 1), f(back, 2), f(back, 3),
-            f(down, 0), f(down, 1), f(down, 2), f(down, 3))
+            f(down, 0), f(down, 1), f(down, 2), f(down, 3));
     }
     
 }

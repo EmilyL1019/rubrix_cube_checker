@@ -45,7 +45,7 @@ fn read_faces(path: &str) -> HashMap<Face, Vec<u8>> {
         let part = part.trim();
 
         let mut split = part.splitn(2, ':');
-
+        
         let label = split
             .next()
             .expect("Missing label")
@@ -93,10 +93,14 @@ pub fn load_cube(path: &str) -> RubrixCube {
 }
 
 // Read moves file 
-pub fn parse_moves_file(file:&str) -> Vec<Move> {
-    let content = fs::read_to_string(file)
-    .unwrap_or_else(|e| panic!("Failed to read moves file {}: {}", file, e));
-
+pub fn parse_moves_file(file:&str, is_file: bool) -> Vec<Move> {
+    let content:String = match is_file {
+        true => {
+            fs::read_to_string(file)
+            .unwrap_or_else(|e| panic!("Failed to read moves file {}: {}", file, e))
+        }
+        false => { file.to_string()}
+    };
     content
         .split_whitespace() // splits on spaces, tabs, AND newlines
         .map(|s| {
